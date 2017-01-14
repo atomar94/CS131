@@ -18,6 +18,17 @@ let rec contains e l =
                 then true
                 else (contains e tl);;
 
+(* returns a list that is a mathematical set, i.e. no duplicates *)
+let rec make_set a =
+    match a with
+      [] -> []
+    | hd::tl -> if (contains hd tl) then
+                    make_set tl
+                else
+                    hd::make_set tl;;
+
+
+
 
 (*
  * HW FUNCTION - subset
@@ -25,13 +36,17 @@ let rec contains e l =
  * remove the first element of a from both a and b, then recurse.
  * if that element does not exist in b then a is not a subset.
  * *)
-let rec subset a b = 
+let rec subset a b =
+    let a = make_set a in
+    let b = make_set b in
     match a with
       []     -> true
     | hd::tl -> if (contains hd b)
                 then let bb = (remove hd b) in
                     subset tl bb
                 else false;;
+
+
 (*
  * HW FUNCTION - equal_sets
  *
@@ -39,12 +54,16 @@ let rec subset a b =
  * but pass in the two modified lists.
  * *)
 let rec equal_sets a b =
+    let a = make_set a in
+    let b = make_set b in
+ 
     match a with
       []     -> if b=[] then true else false
     | hd::tl -> if contains hd b
                 then let bb = remove hd b in
                   equal_sets tl bb
                 else false;;
+
 
 (*
  * HW FUNCTION - set_union
@@ -53,6 +72,8 @@ let rec equal_sets a b =
  * if it is in both, only add it once.
  *)
 let rec set_union a b =
+    let a = make_set a in
+    let b = make_set b in
     let big = a @ b in
 
     match big with
@@ -86,6 +107,9 @@ let rec set_union a b =
  * returned list, else dont add anything. recurse.
  * *)
 let rec set_intersection a b =
+    let a = make_set a in
+    let b = make_set b in
+ 
     let big = a @ b in
 
     match big with
@@ -101,13 +125,41 @@ let rec set_intersection a b =
                         set_intersection aa bb
                 end;;
 
+(*
+ * HW FUNCTION - set_diff
+ *
+ * remove all elements in b from a. if the element
+ * doesnt exist in a then a remains unmodified.
+ * *)
 let rec set_diff a b =
+    let a = make_set a in
+    let b = make_set b in
     match b with
       []     -> a
     | hd::tl -> let aa = remove hd a in
                 set_diff aa tl;;
 
+(*
+ * HW FUNCTION
+ *
+ * iteratively finds the fixed point according to the wikipedia article
+ * *)
+let rec computed_fixed_point eq f x =
+    let result = f x in
+    if  (eq) result x then x else (computed_fixed_point eq f result);;    
 
+
+(*
+ * HW FUNCTION
+ *
+ * if the case is true then add the value to list and recurse,
+ * else return empty list.
+ * *)
+let rec while_away s p x = 
+    let condition = p x in
+    match condition with
+      true -> x::while_away s p (s x)
+    | false -> [] (* false so done *)
 
 
 
