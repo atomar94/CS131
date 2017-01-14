@@ -47,8 +47,27 @@ let rec equal_sets a b =
                 else false;;
 
 
+(*
+ * HW FUNCTION - set_union
+ *
+ * if an element exists in both sets then add it to our
+ * returned list, else dont add anything. recurse.
+ * *)
+let rec set_union a b =
+    let big = a @ b in
 
-
+    match big with
+      []     -> []
+    | hd::tl -> if (contains hd a) && (contains hd b)
+                then begin
+                    let aa = remove hd a in
+                    let bb = remove hd b in
+                        hd::set_union aa bb
+                end else begin
+                    let aa = remove hd a in (*if hd isnt in a then nothing happens*)
+                    let bb = remove hd b in
+                        set_union aa bb
+                end;;
 
 
 
