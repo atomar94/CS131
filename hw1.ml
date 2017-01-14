@@ -46,7 +46,12 @@ let rec equal_sets a b =
                   equal_sets tl bb
                 else false;;
 
-
+(*
+ * HW FUNCTION - set_union
+ *
+ * if an element is in one of the sets add it to the union.
+ * if it is in both, only add it once.
+ *)
 let rec set_union a b =
     let big = a @ b in
 
@@ -95,6 +100,16 @@ let rec set_intersection a b =
                     let bb = remove hd b in
                         set_intersection aa bb
                 end;;
+
+let rec set_diff a b =
+    match b with
+      []     -> a
+    | hd::tl -> let aa = remove hd a in
+                set_diff aa tl;;
+
+
+
+
 
 
 
