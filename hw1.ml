@@ -47,13 +47,40 @@ let rec equal_sets a b =
                 else false;;
 
 
+let rec set_union a b =
+    let big = a @ b in
+
+    match big with
+      []     -> []
+    | hd::tl -> let aa = remove hd a in
+                let bb = remove hd b in
+
+                if (contains hd a) && (contains hd b) then
+                    hd::set_union aa bb
+                else begin
+                    if contains hd a
+                    then
+                        hd::set_union aa b
+                    else begin
+                        if contains hd b
+                        then
+                            hd::set_union a bb
+                        else (*logically this case will never be true, but there
+                               is some syntax bug in ocaml that forces me to have
+                               this else clause.
+                               see http://stackoverflow.com/a/22052996 *)
+                            []
+                    end
+                end;;
+
+
 (*
- * HW FUNCTION - set_union
+ * HW FUNCTION - set_intersection
  *
  * if an element exists in both sets then add it to our
  * returned list, else dont add anything. recurse.
  * *)
-let rec set_union a b =
+let rec set_intersection a b =
     let big = a @ b in
 
     match big with
@@ -62,11 +89,11 @@ let rec set_union a b =
                 then begin
                     let aa = remove hd a in
                     let bb = remove hd b in
-                        hd::set_union aa bb
+                        hd::set_intersection aa bb
                 end else begin
                     let aa = remove hd a in (*if hd isnt in a then nothing happens*)
                     let bb = remove hd b in
-                        set_union aa bb
+                        set_intersection aa bb
                 end;;
 
 
