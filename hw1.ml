@@ -2,6 +2,8 @@
  * Alex Omar - 004 315 572
  *)
 
+open List;;
+
 (* Returns a list with one element matching e removed *)
 let rec remove e l =
     match l with
@@ -142,15 +144,7 @@ let rec set_diff a b =
 (*
  * HW FUNCTION
  *
- * iteratively finds the fixed point according to the wikipedia article
- * *)
-let rec computed_fixed_point eq f x =
-    let result = f x in
-    if  (eq) result x then x else (computed_fixed_point eq f result);;    
-
-
-(*
- * HW FUNCTION
+ * Return s x::s s x::... until (p $last_val) is false.
  *
  * if the case is true then add the value to list and recurse,
  * else return empty list.
@@ -161,6 +155,33 @@ let rec while_away s p x =
       true -> x::while_away s p (s x)
     | false -> [] (* false so done *)
 
+
+
+(*
+ * HW FUNCTION
+ *
+ * iteratively finds the fixed point according to the wikipedia article
+ * *)
+let rec computed_fixed_point eq f x =
+    let result = f x in
+    if  (eq) result x then x else (computed_fixed_point eq f result);;    
+
+(*
+ * HW FUNCTION
+ *
+ * run f x $period number of times and check if that value is the same (and this 
+ *   we've found the period)
+ *
+ * if they dont match, try again but with the next value in the sequence i.e (f f x)
+ *
+ * *)
+let rec computed_periodic_point eq f p x =
+    match p with
+      0 -> x (* base case must be x *)
+    | _ -> let one_period_ahead = f (computed_periodic_point eq f (p-1) (f x)) in(* must call f here *)
+           if (eq) x one_period_ahead (* must call f here because our base case must be x*)
+           then x
+           else computed_periodic_point eq f p (f x);;
 
 
 
