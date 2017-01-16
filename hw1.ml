@@ -30,8 +30,6 @@ let rec make_set a =
                     hd::make_set tl;;
 
 
-
-
 (*
  * HW FUNCTION - subset
  *
@@ -183,8 +181,14 @@ let rec computed_periodic_point eq f p x =
            then x
            else computed_periodic_point eq f p (f x);;
 
-
-
-
-
+(*
+ * HW FUNCTION
+ *
+ * *)
+let rec rle_decode lp =
+    match lp with
+      [] -> []
+    | (0, sym)::tl -> rle_decode tl
+    | (rep, sym)::tl -> let l2 = (rep-1, sym)::tl in
+                        sym::rle_decode l2;;
 
