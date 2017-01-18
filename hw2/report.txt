@@ -1,0 +1,93 @@
+For this homework my solution has two functions that are mutually recursive,
+though this was not the first approach I tried or considered. Most of the 
+approaches I talk about here are not things that I completely implemented, but
+rather considered and then rejected (for reasons that I'll go into below) or
+implemented parts of before realizing that the behavior would differ from what
+I thought it was going to do and so I rejected it as well.
+
+When I first approached the problem I was going to have one very large function
+that would scan the fragment, first trying to convert terminals into
+nonterminals and then converting groups of nonterminals into smaller groups of
+nonterminals until I was left with only the start symbol. My hope was that I 
+would have one function being called recursively so the state of the previous
+attempts would be saved in that function's call stack and that would make it
+(somehow) easier or more natural to access the previous state, go back,
+try different possibilities, etc.
+
+This was not the correct way to solve the problem and it wasn't until I 
+realized that I could have two different functions that recursively call 
+themselves that I realized I could break the problem into multiple parts and 
+still be recursive. I spent a lot of time on that implementation though and so 
+it definitely warrants being the primary focus of my failures. I spent many an 
+hour trying to wrap my head around internal acceptors, matchers, etc. so that 
+I could somehow implement those ideas within my function. I originally wanted 
+to have the large function contain multiple closures and I could pass the 
+closures recursively into the function and create massive higher order 
+closure-functions that would satisfy the internal acceptor idea.
+
+For my implementation I had one function, find_rule, whose job it is to find 
+possibly grammar rules that I can apply to a terminal or nonterminal symbol. 
+The the other function's job (match_rule) is to check to make sure that the 
+chosen rule will work with our fragment. If the rule we are testing works 
+then the match_rule will recursively call find_rule on the rest of the fragment
+suffix and also build up an "internal acceptor" by currying the acceptor with
+the suffix of our fragment it insures that any rule being applied will only 
+work if the rules being applied previously do as well.
+
+Tomer talked about list.fold_left during discussion so I considered approaching
+the problem by having the accululator for fold_left be the acceptor and I could
+somehow build up an internal acceptor this way, but I moved away from this idea
+pretty quickly because conceptually I knew the search space for the problem was
+very large and definitely not something that could be done in just N iterations
+on a list.
+
+From the way that Prof. Eggert and the TAs described the homework problem in
+class I knew that I would have to create an implementation that would be able
+to backtrack and try different paths. I tried implementing some sort of tree
+structure that would recursively grow and I could breadth-first search it when
+I ran into problems with the path I was taking but that really wasn't working.
+I am not sure if you can visualize this problem as a tree-structure but for
+my (final) implementation I thought of it as 2 different operations, one
+expanding laterally (match_rule) and one expanding vertically (find_rule).
+
+
+A Diagram of my Implementation
+
+find_rule                    match_rule
+    | - - -(try this rule)- ->  |
+    |                           (Accepted)
+    | <-(return curried acptr) -|
+    |                           | 
+(match new rule)                |
+    |- - -(try this rule)- - -> | 
+    |                           (rule did not work) 
+    |< - - - -(return) - - - - -|
+    |                           |
+(match next rule)               |
+    |- -(try this next rule) -> |
+    |                           (Accepted)
+    | <-(return curried acptr) -|
+    |                           |
+(cant find more                 |
+ rules!)                        |
+    | - - -(try empty rule) - ->|
+    |                           (empty rule?! Pass the fragment
+    |                            to the acceptor and return whatever
+    |                            it returns!)
+    |<- (ret to parse_prefix) ->|
+    |                           |
+
+
+This is an example of my implementation to see how the two mutually recursive
+functions interact with each other. What's tricky about this implementation is
+that the two functions call each other, whereas I am more used to one function
+being recursive and the other is responsible for a small subset of the
+functionality that simply is called and returns without recursing.
+
+
+
+
+
+
+
+

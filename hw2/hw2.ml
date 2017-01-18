@@ -60,7 +60,44 @@ let convert_grammar gram1 =
     (start, gr) -> (start, get_alt_list (group_rules gr []));;
 
 
+(* Given a rule (i.e. one line in the alt list) check to see if it matches with frag.
+ * if not: return none
+ * if it does: return what acceptor returns
+ * if frag has nonterminals: we need to find a rule that applies (using find_rule) *)
+let rec match_rule pf rule a d f =
+    match rule with
+    | [] -> a d f (* our rule is done matching! return what acceptor returns. *)
+    | r_hd::r_tl -> ( match r_hd with (* frag only has terminals so we have 2 cases here. *)
+                      | T(t_r_hd) -> ( match f with
+                                      | [] -> None (* nothing left in the fragment but the rule has more to match, 
+                                                     so it mustn't be the correct one *)
+                                      | f_hd::f_tl -> if f_hd = t_r_hd then 
+                                                        match_rule pf r_tl a d f_tl (*this matches so keep going *)
+                                                      else
+                                                        None) (* this rule doesnt match, so stop trying. *)
+                      | N(n_r_hd) -> find_rule pf n_r_hd (pf n_r_hd) (* got a nonterm so we need to find_rules for it...*)
+                                               (match_rule pf r_tl a)
+                                                d f) (* pass match_rule as our acceptor so we can recursively build up 
+                                                      * a more complex acceptor (and start where we've left off here!)
+                                                      *)
 
+(* Given a nonterm symbol find the alt-list and try all of the possibilities. 
+ *
+ * Use "and" here because find_rule and match_rule both call each other recursively.
+ * *)
+and find_rule pf nt_symb alt_list a d f =
+    match alt_list with
+    | [] -> None (* none of the rules in the alt list worked *)
+    | alt_hd::alt_tl -> ( let try_this_rule = (match_rule pf alt_hd a (d@[nt_symb, alt_hd]) f) in
+                          match try_this_rule with
+                          | None -> find_rule pf nt_symb alt_tl a d f (* that rule didnt work so try the next one. *)
+                          | worked -> worked) (* rule worked so return the result *)
+
+
+let rec parse_prefix gram a f =
+    match gram with
+      (start, pf) -> find_rule pf start (pf start) a [] f
+    
 
 
 
