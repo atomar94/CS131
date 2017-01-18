@@ -82,16 +82,16 @@ let rec match_rule pf rule a d f =
                                                       *)
 
 (* Given a nonterm symbol find the alt-list and try all of the possibilities. 
- *
+ *  return None on Fail, else Some(d,s)
  * Use "and" here because find_rule and match_rule both call each other recursively.
  * *)
 and find_rule pf nt_symb alt_list a d f =
     match alt_list with
     | [] -> None (* none of the rules in the alt list worked *)
-    | alt_hd::alt_tl -> ( let try_this_rule = (match_rule pf alt_hd a (d@[nt_symb, alt_hd]) f) in
+    | alt_hd::alt_tl -> ( let try_this_rule = (match_rule pf alt_hd a (List.append d [nt_symb, alt_hd]) f) in
                           match try_this_rule with
                           | None -> find_rule pf nt_symb alt_tl a d f (* that rule didnt work so try the next one. *)
-                          | worked -> worked) (* rule worked so return the result *)
+                          | _ -> try_this_rule) (* rule worked so return the result *)
 
 
 let rec parse_prefix gram a f =
