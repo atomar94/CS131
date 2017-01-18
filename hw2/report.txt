@@ -84,7 +84,8 @@ that the two functions call each other, whereas I am more used to one function
 being recursive and the other is responsible for a small subset of the
 functionality that simply is called and returns without recursing.
 
-
+My implmentation will not be able to detect infinite loops in grammars and so
+if I run into one the program will loop until it blows its stack.
 
 
 

@@ -67,19 +67,18 @@ let convert_grammar gram1 =
 let rec match_rule pf rule a d f =
     match rule with
     | [] -> a d f (* our rule is done matching! return what acceptor returns. *)
-    | r_hd::r_tl -> ( match r_hd with (* frag only has terminals so we have 2 cases here. *)
-                      | T(t_r_hd) -> ( match f with
-                                      | [] -> None (* nothing left in the fragment but the rule has more to match, 
-                                                     so it mustn't be the correct one *)
-                                      | f_hd::f_tl -> if f_hd = t_r_hd then 
-                                                        match_rule pf r_tl a d f_tl (*this matches so keep going *)
-                                                      else
-                                                        None) (* this rule doesnt match, so stop trying. *)
-                      | N(n_r_hd) -> find_rule pf n_r_hd (pf n_r_hd) (* got a nonterm so we need to find_rules for it...*)
-                                               (match_rule pf r_tl a)
-                                                d f) (* pass match_rule as our acceptor so we can recursively build up 
-                                                      * a more complex acceptor (and start where we've left off here!)
-                                                      *)
+    | T(r_hd)::r_tl -> ( match f with
+                          | [] -> None (* nothing left in the fragment but the rule has more to match, 
+                                          so it mustn't be the correct one *)
+                          | f_hd::f_tl -> if f_hd = r_hd then 
+                                            match_rule pf r_tl a d f_tl (*this matches so keep going *)
+                                        else
+                                            None) (* this rule doesnt match, so stop trying. *)
+    | N(r_hd)::r_tl -> find_rule pf r_hd (pf r_hd) (* got a nonterm so we need to find_rules for it...*)
+                       (match_rule pf r_tl a)
+                       d f (* pass match_rule as our acceptor so we can recursively build up 
+                            * a more complex acceptor (and start where we've left off here!)
+                            *)
 
 (* Given a nonterm symbol find the alt-list and try all of the possibilities. 
  *  return None on Fail, else Some(d,s)
