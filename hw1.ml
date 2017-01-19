@@ -1,8 +1,14 @@
 (* CS 131 HW 1
+ * 
  * Alex Omar - 004 315 572
  *)
 
 open List;;
+
+
+type ('nonterminal, 'terminal) symbol =
+      | N of 'nonterminal
+      | T of 'terminal;;
 
 (* Returns a list with one element matching e removed *)
 let rec remove e l =
@@ -191,4 +197,39 @@ let rec rle_decode lp =
     | (0, sym)::tl -> rle_decode tl
     | (rep, sym)::tl -> let l2 = (rep-1, sym)::tl in
                         sym::rle_decode l2;;
+
+(* Blind alley implementation code*)
+
+(*When we pass args like this then any function that calls this function will assign the
+ * type to the value being passed in!!!
+ * This will cause type mismatches and hours of debugging. *)
+let rec is_valid_rule valids rule = 
+    match valids with
+      [] -> false (*couldnt find*)
+    | (vrule, vsubs)::tl -> if vrule=rule then true else is_valid_rule tl rule
+
+(*When we pass types like this then the function knows what type it is but any other function
+ * has no idea!!! 
+ * *)
+let is_valid2 valids = function
+    | N rule -> contains rule valids
+    | T _ -> true;;
+
+
+let rec not_ba valids (rule, subs) =
+    match subs with
+      [] -> true
+    | hd::tl -> let (vrules, _) = List.split valids in
+                if is_valid2 vrules hd then not_ba valids (rule, tl) else false
+    ;;
+
+let rec get_rules valids gr =
+    let new_valids = List.filter (not_ba valids) gr in
+    let newlen = List.length new_valids in
+    let oldlen = List.length valids in
+    if(newlen=oldlen) then new_valids else get_rules new_valids gr;;
+
+let filter_blind_alleys (rule, gr) =
+    (rule, get_rules [] gr)
+
 
