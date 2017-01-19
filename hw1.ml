@@ -223,6 +223,24 @@ let rec not_ba valids (rule, subs) =
                 if is_valid2 vrules hd then not_ba valids (rule, tl) else false
     ;;
 
+
+let foo arg1 =
+    match arg1 with
+      T _ -> true
+    | N _ -> false;;
+
+let bar = function
+    | T rule -> true
+    | N rule -> false;;
+
+let calling_foo arg1 =
+    foo arg1;;
+
+let calling_bar arg1 =
+    bar arg1;;
+
+
+
 let rec get_rules valids gr =
     let new_valids = List.filter (not_ba valids) gr in
     let newlen = List.length new_valids in
