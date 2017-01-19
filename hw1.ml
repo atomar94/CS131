@@ -1,7 +1,3 @@
-(* CS 131 HW 1
- * 
- * Alex Omar - 004 315 572
- *)
 
 open List;;
 
