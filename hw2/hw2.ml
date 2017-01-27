@@ -43,16 +43,21 @@ let rec group_rules notyet grouped =
                 group_rules (List.filter grammar_filter_neg notyet) (grouped @ [(nonterm, rule_list)])
     | [] -> grouped;;
 
+
+(* -- Production Function --
+ *
+ * Given a Grammar of the Second Kind (hw 2 grammar) return the alternative list 
+ * i.e. a list of possible rules to apply to that nonterm 
+ * *)
+let rec get_alt_list grlist nonterm =
+    match grlist with
+      (nt, rules)::tl -> if nt=nonterm then rules else get_alt_list tl nonterm
+    | [] -> [];;
+
+
 let convert_grammar gram1 =
     match gram1 with
-    (expr, gr) -> (expr, group_rules gr []);;
-
-
-
-
-
-
-
+    (start, gr) -> (start, get_alt_list (group_rules gr []));;
 
 
 
