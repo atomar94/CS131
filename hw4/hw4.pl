@@ -235,6 +235,8 @@ error_handler([error | T], [#], Output):-
 /*if we found a non-special case (not a #, not an error) then add the symbol
 * to the current word buffer and keep looking */
 error_handler([H | T], Current_word, Output):-
+    \+first([H], error), /*dont use this rule is H is "empty" (in case of backtrack), we have rules for that. */
+    \+first([H], #), /*dont use this rule if H is #, we have a rule for that.*/
     append(Current_word, [H], New_word),
     error_handler(T, New_word, Output).
 
