@@ -212,18 +212,18 @@ error_handler([], W, Output):-
 * */
 error_handler([# | T], Current_word, Output):-
     error_handler(T, [#], Output_future),
-    append(Current_word, Output_future, Output).
+    append(Current_word, Output_future, Output). %todo is this the right append ordering?
 
 /*if we got an error and nothing is in the buffer then theres nothing to clear,
 * so this error symbol can get appended to our output */
 error_handler([error | T], [], Output):-
     error_handler(T, [], Output_future),
-    append([error], Output_future, output).
+    append([error], Output_future, Output).
 
 /*if we got an error and we have a word in the buffer (more than just a #)
 * then clear buffer and keep going */
 error_handler([error | T], [Current_word_H | Current_word_T], Output):-
-    ( \+(first(Current_word_T, []))), /*the buffer has more stuff after the #*/
+    \+(first(Current_word_T, [])), /*the buffer has more stuff after the #*/
     error_handler(T, [], Output).
 
 /*we got an error and we have only a hashtag in the buffer, flush the buffer to output*/
